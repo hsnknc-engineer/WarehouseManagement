@@ -28,4 +28,5 @@ jobs:
         run: dotnet build ./WMSBackend/WMSBackend.csproj --no-restore  # Baut das Projekt
 
       - name: Run tests
-        run: dotnet test ./WMSBackend/WMSBackend.csproj --logger "console;verbosity=detailed"  # Führt Unit-Tests aus
+        run: dotnet test ./WMSBackend.UnitTest/WMSBackend.UnitTest.csproj --logger "console;verbosity=detailed"  # Führt Unit-Tests aus
+
