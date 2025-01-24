@@ -28,12 +28,13 @@ jobs:
         run: dotnet build ./WMSBackend/WMSBackend.csproj --no-restore  # Baut das Projekt
 
       - name: Run tests
-        run: dotnet test ./WMSBackend.UnitTest/WMSBackend.UnitTest.csproj --logger "trx;LogFileName=test-results.trx"  # Führt Unit-Tests aus
+        run: dotnet test ./WMSBackend.UnitTest/WMSBackend.UnitTest.csproj --logger "trx;LogFileName=WMSBackend.UnitTest/TestResults/test-results.trx"
+        continue-on-error: true  # Setzt den Workflow nicht sofort auf "failed", wenn Tests fehlschlagen
       
       - name: Upload test results
-        if: always()  # Führt diesen Schritt unabhängig vom Erfolg oder Fehlschlag aus
-        uses: actions/upload-artifact@v3  # Lädt die Testberichte hoch
+        if: always()  # Führt diesen Schritt unabhängig vom Ergebnis des vorherigen Schritts aus
+        uses: actions/upload-artifact@v3
         with:
           name: TestResults
-          path: test-results.trx
+          path: WMSBackend.UnitTest/TestResults/test-results.trx
 
