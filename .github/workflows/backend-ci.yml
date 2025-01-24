@@ -3,14 +3,14 @@ name: .NET Core Backend CI  # Name der Pipeline
 on:
   push:
     branches:
-      - master  # Führt die Pipeline bei Pushes auf den Hauptbranch aus
+      - master
   pull_request:
     branches:
-      - master  # Führt die Pipeline bei Pull Requests auf den Hauptbranch aus
+      - master
 
 jobs:
   build-and-test:
-    runs-on: ubuntu-latest  # Nutzt einen Linux-Runner
+    runs-on: ubuntu-latest  # Ein einziger Job auf einer Linux-Umgebung
 
     steps:
       - name: Checkout repository
@@ -19,7 +19,7 @@ jobs:
       - name: Setup .NET Core
         uses: actions/setup-dotnet@v2  # Installiert .NET Core
         with:
-          dotnet-version: '8.0'  # .NET Version
+          dotnet-version: '8.0'
 
       - name: Restore dependencies
         run: dotnet restore ./WMSBackend/WMSBackend.csproj  # Stellt NuGet-Abhängigkeiten her
@@ -28,4 +28,11 @@ jobs:
         run: dotnet build ./WMSBackend/WMSBackend.csproj --no-restore  # Baut das Projekt
 
       - name: Run tests
-        run: dotnet test ./WMSBackend/WMSBackend.csproj --logger "console;verbosity=detailed"  # Führt Unit-Tests aus
+        run: dotnet test ./WMSBackend.UnitTest/WMSBackend.UnitTest.csproj --logger "trx;LogFileName=TestResults.trx"
+
+      - name: Upload test results
+        if: always()  # Führt diesen Schritt aus, egal ob Tests erfolgreich sind oder nicht
+        uses: actions/upload-artifact@v3
+        with:
+          name: TestResults
+          path: WMSBackend.UnitTest/TestResults/TestResults.trx
