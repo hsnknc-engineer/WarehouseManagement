@@ -28,8 +28,9 @@ jobs:
         run: dotnet build ./WMSBackend/WMSBackend.csproj --no-restore  # Baut das Projekt
 
       - name: Run tests
-        run: dotnet test ./WMSBackend.UnitTest/WMSBackend.UnitTest.csproj --logger "trx;LogFileName=WMSBackend.UnitTest/TestResults/test-results.trx"
-        continue-on-error: true  # Setzt den Workflow nicht sofort auf "failed", wenn Tests fehlschlagen
+        run: dotnet test ./WMSBackend.UnitTest/WMSBackend.UnitTest.csproj --logger "trx;LogFileName=WMSBackend.UnitTest/TestResults.trx"
+        continue-on-error: true  # Auch bei fehlgeschlagenen Tests fortfahren
+
       
       - name: Upload test results
         if: always()  # Führt diesen Schritt unabhängig vom Ergebnis des vorherigen Schritts aus
