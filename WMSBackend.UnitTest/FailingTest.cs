@@ -17,9 +17,19 @@ namespace WMSBackend.UnitTest
             int expected = 5;
             int actual = 3;
 
-
             // Act & Assert: Absichtlich Falsch
             Assert.That(actual, Is.EqualTo(expected), "Dieser Test schlägt fehl, weil 5 != 3.");
+        }
+
+        [Test]
+        public void ThisTestWillPass()
+        {
+            // Arrange
+            int expected = 5;
+            int actual = 5;
+
+            // Act & Assert: Erfolgreich
+            Assert.That(actual, Is.EqualTo(expected), "Dieser Test sollte erfolgreich sein, weil 5 == 5.");
         }
     }
 }
