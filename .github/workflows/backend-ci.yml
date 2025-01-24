@@ -3,10 +3,10 @@ name: .NET Core Backend CI  # Name der Pipeline
 on:
   push:
     branches:
-      - main  # Führt die Pipeline bei Pushes auf den Hauptbranch aus
+      - master  # Führt die Pipeline bei Pushes auf den Hauptbranch aus
   pull_request:
     branches:
-      - main  # Führt die Pipeline bei Pull Requests auf den Hauptbranch aus
+      - master  # Führt die Pipeline bei Pull Requests auf den Hauptbranch aus
 
 jobs:
   build-and-test:
