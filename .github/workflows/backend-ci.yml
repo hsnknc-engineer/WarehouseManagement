@@ -28,14 +28,15 @@ jobs:
         run: dotnet build ./WMSBackend/WMSBackend.csproj --no-restore  # Baut das Projekt
 
       - name: Run tests
-        run: dotnet test ./WMSBackend.UnitTest/WMSBackend.UnitTest.csproj --logger "trx;LogFileName=WMSBackend.UnitTest/TestResults.trx"
+        run: dotnet test ./WMSBackend.UnitTest/WMSBackend.UnitTest.csproj --logger "trx;LogFileName=TestResults.trx"
         continue-on-error: true  # Auch bei fehlgeschlagenen Tests fortfahren
 
       
       - name: Upload test results
-        if: always()  # Führt diesen Schritt unabhängig vom Ergebnis des vorherigen Schritts aus
+        if: always()  # Führt den Schritt immer aus, auch bei fehlgeschlagenen Tests
         uses: actions/upload-artifact@v3
         with:
-          name: TestResults
-          path: WMSBackend.UnitTest/TestResults/test-results.trx
+            name: TestResults
+            path: WMSBackend.UnitTest/TestResults.trx
+
 
