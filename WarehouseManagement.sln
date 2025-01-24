@@ -5,6 +5,8 @@ VisualStudioVersion = 17.12.35527.113 d17.12
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WMSBackend", "WMSBackend\WMSBackend.csproj", "{F9673F5F-975C-4159-9D82-514B37B97497}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WMSBackend.UnitTest", "WMSBackend.UnitTest\WMSBackend.UnitTest.csproj", "{042742C2-5E18-4A0B-B342-168D21864B1A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{F9673F5F-975C-4159-9D82-514B37B97497}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F9673F5F-975C-4159-9D82-514B37B97497}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F9673F5F-975C-4159-9D82-514B37B97497}.Release|Any CPU.Build.0 = Release|Any CPU
+		{042742C2-5E18-4A0B-B342-168D21864B1A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{042742C2-5E18-4A0B-B342-168D21864B1A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{042742C2-5E18-4A0B-B342-168D21864B1A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{042742C2-5E18-4A0B-B342-168D21864B1A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
