@@ -30,3 +30,9 @@ jobs:
       - name: Run tests
         run: dotnet test ./WMSBackend.UnitTest/WMSBackend.UnitTest.csproj --logger "console;verbosity=detailed"  # Führt Unit-Tests aus
 
+      - name: Upload test results
+        uses: actions/upload-artifact@v3  # Lädt die Testberichte hoch
+        with:
+          name: TestResults
+          path: test-results.trx
+
