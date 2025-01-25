@@ -16,7 +16,7 @@ namespace WMSBackend.UnitTest
         public void Should_Create_Article_When_Valid_Inputs(int id, string name)
         {
             // Act
-            var article = new Article(20, name);
+            var article = new Article(id, name);
 
             // Assert
             Assert.That(article.Id, Is.EqualTo(id), "Die ID wurde nicht korrekt gesetzt.");
