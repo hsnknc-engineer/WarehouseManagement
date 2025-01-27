@@ -1,67 +1,65 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using NUnit.Framework;
 using WMSBackend.Data;
 using WMSBackend.Models;
 using WMSBackend.Repositories;
-
 
 namespace WMSBackend.UnitTest
 {
     [TestFixture]
     public class ArticleRepositoryTests
     {
-        private static AppDbContext _context; // Gemeinsamer Datenbankkontext
-        private static ArticleRepository _repository; // Gemeinsames Repository
+        private AppDbContext _context; // Datenbankkontext
+        private ArticleRepository _repository; // Artikel-Repository
 
-        [OneTimeSetUp] // Wird nur einmal vor allen Tests ausgeführt
-        public void OneTimeSetup()
+        [SetUp]
+        public void Setup()
         {
-            // Konfiguration für die Verbindung zur Datenbank
+            // SQLite In-Memory-Datenbank konfigurieren
             var options = new DbContextOptionsBuilder<AppDbContext>()
-                .UseSqlServer("Server=DESKTOP-HE4ULMV;Database=WMSDatabase;User Id=TestUser;Password=Passwort123;TrustServerCertificate=True;Encrypt=False")
+                .UseSqlite("DataSource=:memory:") // Nutze In-Memory SQLite-Datenbank
                 .Options;
 
-            // Initialisierung von DbContext und Repository
             _context = new AppDbContext(options);
+            _context.Database.OpenConnection(); // Verbindung öffnen
+            _context.Database.EnsureCreated(); // Datenbank erstellen
+
             _repository = new ArticleRepository(_context);
         }
 
         [Test]
         public void AddArticle_ShouldAddArticleToDatabase()
         {
-            // Arrange: Erstelle einen neuen Artikel
-            var newArticle = new Article { Name = "Artikel B" }; // ID wird automatisch generiert
+            // Arrange
+            var newArticle = new Article { Name = "Artikel A" };
 
-            // Act: Füge den Artikel hinzu
+            // Act
             _repository.AddArticle(newArticle);
 
-            // Assert: Überprüfe, ob der Artikel korrekt hinzugefügt wurde
-            var addedArticle = _repository.SearchArticleById(newArticle.Id); // Automatisch generierte ID
-            Assert.That(addedArticle, Is.Not.Null, "Der Artikel wurde nicht in die Datenbank eingefügt.");
-            Assert.That(addedArticle.Name, Is.EqualTo("Artikel B"), "Der Artikelname wurde nicht korrekt gespeichert.");
+            // Assert
+            var addedArticle = _repository.SearchArticleById(newArticle.Id);
+            Assert.That(addedArticle, Is.Not.Null);
+            Assert.That(addedArticle.Name, Is.EqualTo("Artikel A"));
         }
 
         [Test]
-        public void GetAllArticles_ShouldReturnExistingArticlesInDatabase()
+        public void GetAllArticles_ShouldReturnExistingArticles()
         {
-            // Act: Rufe alle vorhandenen Artikel aus der Datenbank ab
+            // Arrange
+            _repository.AddArticle(new Article { Name = "Artikel A" });
+            _repository.AddArticle(new Article { Name = "Artikel B" });
+
+            // Act
             var articles = _repository.GetAllArticles();
 
-            // Assert: Überprüfe, ob Artikel in der Datenbank vorhanden sind
-            Assert.That(articles, Is.Not.Null, "Die Artikel-Liste ist null.");
-            Assert.That(articles.Count, Is.GreaterThan(0), "Es wurden keine Artikel gefunden.");
-
-            // Optional: Gib die Artikel in der Konsole aus
-            foreach (var article in articles)
-            {
-                Console.WriteLine($"ID: {article.Id}, Name: {article.Name}");
-            }
+            // Assert
+            Assert.That(articles.Count, Is.EqualTo(2));
         }
 
-        [OneTimeTearDown] // Wird nur einmal nach allen Tests ausgeführt
-        public void OneTimeTearDown()
+        [TearDown]
+        public void TearDown()
         {
-            // Ressourcen nach allen Tests freigeben
-            _context.Dispose();
+            _context.Dispose(); // Ressourcen freigeben
         }
     }
 }
