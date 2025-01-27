@@ -1,94 +1,55 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using WMSBackend.Models; // Referenz zu deinem Artikel-Modell
-
+using WMSBackend.Data;
+using WMSBackend.Models;
 
 namespace WMSBackend.Repositories
 {
     public class ArticleRepository
     {
-        // Deklaration der Liste _articles
-        private readonly List<Article> _articles; // Liste, die Artikel speichert
+        private readonly AppDbContext _context;
 
-
-        // Constructor
-        public ArticleRepository()
+        public ArticleRepository(AppDbContext context)
         {
-            // Initialisierung der Liste _articles im Konstruktor
-            _articles = new List<Article>// Beispielhafte Artikel für eine In-Memory-Datenbank
-            {
-                new Article(1, "Artikel A"),
-                new Article(2, "Artikel B"),
-                new Article(3, "Artikel C")
-            };
+            _context = context;
         }
 
-        public List<Article> GetAllArticles()
+        // Artikel hinzufügen
+        public void AddArticle(Article article)
         {
-            return _articles; // Gibt die gesamte Artikelliste zurück
+            if (article == null)
+                throw new ArgumentNullException(nameof(article));
+
+            _context.SqlArticles.Add(article); // ID wird automatisch generiert
+            _context.SaveChanges(); // Speichern in der Datenbank
         }
 
-
+        // Artikel per ID suchen
         public Article SearchArticleById(int id)
         {
-            // 1. Validierung: ID muss größer als 0 sein.
             if (id <= 0)
-            {
                 throw new ArgumentException("Die ID muss größer als 0 sein.", nameof(id));
-            }
 
-            // 2. Suche den Artikel in der Liste
-            var article = _articles.FirstOrDefault(a => a.Id == id);
-
-            // 3. Überprüfen, ob ein Artikel gefunden wurde
+            var article = _context.SqlArticles.FirstOrDefault(a => a.Id == id);
             if (article == null)
-            {
-                throw new ArgumentException("Artikel mit dieser ID wurde nicht gefunden.", nameof(id));
-            }
+                throw new KeyNotFoundException($"Kein Artikel mit der ID {id} gefunden.");
 
-            // 4. Artikel zurückgeben
             return article;
         }
 
-
-        public void AddArticle(Article article)
+        // Alle Artikel abrufen
+        public List<Article> GetAllArticles()
         {
-            // Überprüfe, ob der Artikel null ist
-            if (article == null)
-                throw new ArgumentNullException(nameof(article), "Artikel darf nicht null sein.");
-
-            // Überprüfe, ob ein Artikel mit derselben ID bereits existiert
-            if (_articles.Any(a => a.Id == article.Id))
-                throw new ArgumentException("Ein Artikel mit dieser ID existiert bereits.", nameof(article.Id));
-
-            // Füge den Artikel zur Liste hinzu
-            _articles.Add(article);
+            return _context.SqlArticles.ToList();
         }
 
-
-        public bool DeleteArticle(int id)
+        // Artikel löschen
+        public void DeleteArticle(int id)
         {
-            // Validierung der ID
-            if (id <= 0)
-            {
-                throw new ArgumentException("Die ID muss größer als 0 sein.", nameof(id));
-            }
-
-            // Suche den Artikel mit der angegebenen ID
-            var articleToDelete = _articles.FirstOrDefault(a => a.Id == id);
-
-            // Überprüfen, ob der Artikel existiert
-            if (articleToDelete == null)
-            {
-                return false; // Kein Artikel gefunden
-            }
-
-            // Entferne den Artikel aus der Liste
-            _articles.Remove(articleToDelete);
-            return true; // Artikel erfolgreich gelöscht
+            var articleToDelete = SearchArticleById(id);
+            _context.SqlArticles.Remove(articleToDelete);
+            _context.SaveChanges();
         }
-
-
     }
 }

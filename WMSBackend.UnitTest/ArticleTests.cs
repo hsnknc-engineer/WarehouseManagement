@@ -1,49 +1,33 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using WMSBackend.Models;
+﻿using WMSBackend.Models;
+
 
 namespace WMSBackend.UnitTest
 {
-    [TestFixture] // Markiert diese Klasse als eine Testklasse
+    [TestFixture]
     public class ArticleTests
     {
-        [TestCase(1, "ValidName", TestName = "Gültiger Artikel: ID=1, Name=ValidName")]
-        [TestCase(100, "AnotherValidName", TestName = "Gültiger Artikel: ID=100, Name=AnotherValidName")]
-        [TestCase(999, "Name123", TestName = "Gültiger Artikel: ID=999, Name=Name123")]
-        public void Should_Create_Article_When_Valid_Inputs(int id, string name)
+        [TestCase("ValidName", TestName = "Gültiger Artikel: Name=ValidName")]
+        [TestCase("AnotherValidName", TestName = "Gültiger Artikel: Name=AnotherValidName")]
+        [TestCase("Name123", TestName = "Gültiger Artikel: Name=Name123")]
+        public void Should_Create_Article_When_Valid_Name(string name)
         {
             // Act
-            var article = new Article(id, name);
+            var article = new Article { Name = name }; // Nutzt den Objekt-Initializer
 
             // Assert
-            Assert.That(article.Id, Is.EqualTo(id), "Die ID wurde nicht korrekt gesetzt.");
             Assert.That(article.Name, Is.EqualTo(name), "Der Name wurde nicht korrekt gesetzt.");
         }
 
-
-        [TestCase(0, "ValidName", TestName = "Ungültige ID: 0")]
-        [TestCase(-1, "ValidName", TestName = "Ungültige ID: negativ")]
-        [TestCase(1, "", TestName = "Ungültiger Name: leer")]
-        [TestCase(1, "ab", TestName = "Ungültiger Name: weniger als 3 Zeichen")]
-        public void Article_InvalidInputs_ShouldThrowArgumentException(int id, string name)
+        [TestCase("", TestName = "Ungültiger Name: leer")]
+        [TestCase("ab", TestName = "Ungültiger Name: weniger als 3 Zeichen")]
+        [TestCase("  ", TestName = "Ungültiger Name: nur Leerzeichen")] // Anstatt null
+        public void Should_Throw_Exception_When_Name_Is_Invalid(string name)
         {
             // Act & Assert
-            var ex = Assert.Throws<ArgumentException>(() => new Article(id, name));
+            var ex = Assert.Throws<ArgumentException>(() => new Article { Name = name });
 
-            // Optional: Überprüfen der Fehlermeldung
-            if (id <= 0)
-            {
-                Assert.That(ex.Message, Does.Contain("Id must be greater than 0"));
-            }
-            else if (string.IsNullOrWhiteSpace(name) || name.Length < 3)
-            {
-                Assert.That(ex.Message, Does.Contain("Name must be at least 3 characters long"));
-            }
+            // Überprüfen der Fehlermeldung
+            Assert.That(ex.Message, Does.Contain("Name must be at least 3 characters long"));
         }
-
-
     }
 }

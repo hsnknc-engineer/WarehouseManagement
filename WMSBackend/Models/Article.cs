@@ -2,19 +2,21 @@
 {
     public class Article
     {
-        public int Id { get; set; } // Artikel-ID, muss größer als 0 sein
-        public string Name { get; set; } // Name des Artikels, mindestens 3 Zeichen
+        public int Id { get; set; } // Automatisch generierte ID
 
-        public Article(int id, string name)
+        private string _name = string.Empty; // Standardwert
+        public required string Name
         {
-            if (id <= 0)
-                throw new ArgumentException("Id must be greater than 0");
-
-            if (string.IsNullOrWhiteSpace(name) || name.Length < 3)
-                throw new ArgumentException("Name must be at least 3 characters long");
-
-            Id = id;
-            Name = name;
+            get => _name;
+            set
+            {
+                if (string.IsNullOrWhiteSpace(value) || value.Length < 3)
+                    throw new ArgumentException("Name must be at least 3 characters long");
+                _name = value;
+            }
         }
+
+        // Parameterloser Konstruktor (für Entity Framework benötigt)
+        public Article() { }
     }
 }

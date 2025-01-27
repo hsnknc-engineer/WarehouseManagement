@@ -1,84 +1,67 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.EntityFrameworkCore;
+using WMSBackend.Data;
 using WMSBackend.Models;
 using WMSBackend.Repositories;
 
-namespace WMSBackend.UnitTest.Repositories
+
+namespace WMSBackend.UnitTest
 {
-    [TestFixture] // Markiert diese Klasse als Testklasse
+    [TestFixture]
     public class ArticleRepositoryTests
     {
-        private ArticleRepository _repository; // Repository-Instanz für die Tests
+        private static AppDbContext _context; // Gemeinsamer Datenbankkontext
+        private static ArticleRepository _repository; // Gemeinsames Repository
 
-        [SetUp] // Setup-Methode wird vor jedem Test ausgeführt
-        public void Setup()
+        [OneTimeSetUp] // Wird nur einmal vor allen Tests ausgeführt
+        public void OneTimeSetup()
         {
-            _repository = new ArticleRepository(); // Repository initialisieren
+            // Konfiguration für die Verbindung zur Datenbank
+            var options = new DbContextOptionsBuilder<AppDbContext>()
+                .UseSqlServer("Server=DESKTOP-HE4ULMV;Database=WMSDatabase;User Id=TestUser;Password=Passwort123;TrustServerCertificate=True;Encrypt=False")
+                .Options;
+
+            // Initialisierung von DbContext und Repository
+            _context = new AppDbContext(options);
+            _repository = new ArticleRepository(_context);
         }
 
-        
-
-
-        [Test] // Test für das Hinzufügen eines Artikels
-        public void AddArticle_ShouldAddArticle_WhenValid()
+        [Test]
+        public void AddArticle_ShouldAddArticleToDatabase()
         {
-            // Arrange
-            var newArticle = new Article(4, "Artikel D");
+            // Arrange: Erstelle einen neuen Artikel
+            var newArticle = new Article { Name = "Artikel B" }; // ID wird automatisch generiert
 
-            // Act
+            // Act: Füge den Artikel hinzu
             _repository.AddArticle(newArticle);
 
-            // Assert
-            var addedArticle = _repository.SearchArticleById(4);
-            Assert.That(addedArticle, Is.Not.Null, "Der Artikel wurde nicht hinzugefügt.");
-            Assert.That(addedArticle.Name, Is.EqualTo("Artikel D"), "Der Artikelname wurde nicht korrekt gespeichert.");
+            // Assert: Überprüfe, ob der Artikel korrekt hinzugefügt wurde
+            var addedArticle = _repository.SearchArticleById(newArticle.Id); // Automatisch generierte ID
+            Assert.That(addedArticle, Is.Not.Null, "Der Artikel wurde nicht in die Datenbank eingefügt.");
+            Assert.That(addedArticle.Name, Is.EqualTo("Artikel B"), "Der Artikelname wurde nicht korrekt gespeichert.");
         }
 
-        [Test] // Test für Suchen von Artikel
-        public void SearchArticleById_ShouldReturnArticle_WhenIdExists()
+        [Test]
+        public void GetAllArticles_ShouldReturnExistingArticlesInDatabase()
         {
-            // Arrange
-            int searchedID = 3;
+            // Act: Rufe alle vorhandenen Artikel aus der Datenbank ab
+            var articles = _repository.GetAllArticles();
 
-            // Act
-            var article = _repository.SearchArticleById(searchedID);
+            // Assert: Überprüfe, ob Artikel in der Datenbank vorhanden sind
+            Assert.That(articles, Is.Not.Null, "Die Artikel-Liste ist null.");
+            Assert.That(articles.Count, Is.GreaterThan(0), "Es wurden keine Artikel gefunden.");
 
-            // Assert
-            // Überprüft, ob ein Artikel mit der gesuchten ID gefunden wurde (stellt sicher, dass kein null zurückgegeben wurde).
-            Assert.That(article, Is.Not.Null); // Überprüft, ob ein Artikel gefunden wurde.
-
-
-            // Stellt sicher, dass die gefundene Artikel-ID tatsächlich mit der gesuchten ID übereinstimmt
-            // (doppelte Überprüfung für Genauigkeit).
-            Assert.That(article.Id, Is.EqualTo(searchedID));
+            // Optional: Gib die Artikel in der Konsole aus
+            foreach (var article in articles)
+            {
+                Console.WriteLine($"ID: {article.Id}, Name: {article.Name}");
+            }
         }
 
-
-        [Test] // Test für Löschen eines nicht existierenden Artikels
-        public void DeleteArticle_ShouldReturnFalse_WhenIdDoesNotExist()
+        [OneTimeTearDown] // Wird nur einmal nach allen Tests ausgeführt
+        public void OneTimeTearDown()
         {
-            // Arrange
-            int nonExistingId = 999;
-
-            // Act
-            var result = _repository.DeleteArticle(nonExistingId);
-
-            // Assert
-            Assert.That(result, Is.False, "Die Methode sollte false zurückgeben, wenn der Artikel nicht existiert.");
-        }
-
-        [Test] // Test für ungültige ID
-        public void DeleteArticle_ShouldThrowException_WhenIdIsInvalid()
-        {
-            // Arrange
-            int invalidId = 0;
-
-            // Act & Assert
-            Assert.Throws<ArgumentException>(() => _repository.DeleteArticle(invalidId),
-                "Die Methode sollte eine Ausnahme auslösen, wenn die ID ungültig ist.");
+            // Ressourcen nach allen Tests freigeben
+            _context.Dispose();
         }
     }
 }
