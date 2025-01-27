@@ -15,9 +15,8 @@ namespace WMSBackend.UnitTest
         [SetUp]
         public void Setup()
         {
-            // SQLite In-Memory-Datenbank konfigurieren
             var options = new DbContextOptionsBuilder<AppDbContext>()
-                .UseSqlite("DataSource=:memory:") // Nutze In-Memory SQLite-Datenbank
+                .UseSqlite("DataSource=:memory:") // Nutze SQLite In-Memory-Datenbank
                 .Options;
 
             _context = new AppDbContext(options);
@@ -26,6 +25,7 @@ namespace WMSBackend.UnitTest
 
             _repository = new ArticleRepository(_context);
         }
+
 
         [Test]
         public void AddArticle_ShouldAddArticleToDatabase()
